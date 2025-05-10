@@ -1,4 +1,4 @@
-# Použité oučastky
+# Použité součastky
 
 - Arduino UNO
 - LCD 1602 s I2C rozhraním

@@ -23,14 +23,14 @@ class SerialInterface:
             print("Error while opening")
             sys.exit()
 
-    def read_data(self): # returns received data as string
+    def read_data(self):  # returns received data as string
         try:
             return self._ser.readline().decode("utf-8")
         except:
             return "something went wrong"
 
-    def write_data(self, data): # sends string data
-        to_send = bytes(data,'ASCII')
+    def write_data(self, data):  # sends string data
+        to_send = bytes(data, 'ASCII')
         self._ser.write(to_send)
 
     def close(self):
@@ -69,6 +69,7 @@ def find_line(card, pin):
                     if cards[card] == pin:
                         return line_number, cards, balance
                     else:
+                        print((cards[card], pin))
                         return -1, "Error: wrong pin"
 
                 line_number += 1
@@ -85,10 +86,8 @@ def change_line(line_number, new_line):
         for i, line in enumerate(src):
             if i == line_number:
                 dst.write(new_line + '\n')
-                print(new_line)
             else:
                 dst.write(line)
-                print(line, end="")
 
     os.replace(temp_path, CSV_FILE)
 
@@ -115,6 +114,8 @@ def response(serial_inp):
         change_line(result[0], f"\"{encode_cards(result[1])}\",{result[2]}")
         return "Pin changed"
 
+    return False
+
 
 def main():
     com_port = input("COM port: ")
@@ -125,11 +126,15 @@ def main():
 
     while True:
         try:
-            values = ser.read_data().split(",")
-            res = response(values)
-            ser.writeData(res)
+            values = ser.read_data().strip().split(",")
+            if len(values) > 1 and values[0] in ["pay", "dep", "bal", "ch_pin"]:
+                res = response(values)
+                if res:
+                    print(res)  # DEBUG
+                    ser.write_data(res)
         except KeyboardInterrupt:
             ser.close()
+
 
 if __name__ == "__main__":
     main()

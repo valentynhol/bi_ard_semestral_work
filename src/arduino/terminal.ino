@@ -231,6 +231,7 @@ void menu(int choice) {
   }
 }
 
+bool responseReceived = false;
 void changeState(char key) {
     switch (STATE) {
         case HOME_SEL_PAY:
@@ -293,6 +294,7 @@ void changeState(char key) {
                 }
 
                 menu(0);
+                responseReceived = false;
                 NEXT_STATE = READ_RESP;
             }
             break;
@@ -309,6 +311,7 @@ void changeState(char key) {
                 }
 
                 menu(0);
+                responseReceived = false;
                 NEXT_STATE = READ_RESP;
             }
             break;
@@ -325,6 +328,7 @@ void changeState(char key) {
                 }
 
                 menu(0);
+                responseReceived = false;
                 NEXT_STATE = READ_RESP;
             }
             break;
@@ -341,6 +345,7 @@ void changeState(char key) {
                 }
 
                 menu(0);
+                responseReceived = false;
                 NEXT_STATE = READ_RESP;
             }
             break;
@@ -348,8 +353,14 @@ void changeState(char key) {
             if (key == BACK) {
                 menu(1);
                 NEXT_STATE = HOME_SEL_PAY;
-            } else {
-                // TODO: read serial
+            } else if (!responseReceived) {
+                String str = Serial.readStringUntil('\n');
+                if (str) {
+                    responseReceived = true;
+                    lcd.clear();
+                    lcd.setCursor(0, 0);
+                    lcd.print(str);
+                }
             }
             break;
     }
